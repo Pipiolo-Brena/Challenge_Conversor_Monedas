@@ -25,10 +25,13 @@ public class Main {
             String codigoMoneda = jsonResponse.get("base_code").getAsString();
             JsonObject conversiones = jsonResponse.getAsJsonObject("conversion_rates");
 
-            double dolarPeso = conversiones.get("MXN").getAsDouble();
+            String[] filtro={"ARS", "BOB", "BRL"};
 
-            System.out.println("Codigo de moneda:" + codigoMoneda);
-            System.out.println("1"+ codigoMoneda + " = "+ dolarPeso+" MXN");
+            System.out.println("Tasas de cambio monedas filtradas:");
+            for (String moneda : filtro) {
+                double valor = conversiones.get(moneda).getAsDouble();
+                System.out.println("1"+codigoMoneda+"->"+ moneda + ": " + valor);
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
