@@ -20,9 +20,15 @@ public class Main {
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-            System.out.println("Código de estado: " + response.statusCode());
-            System.out.println("Encabezados: " + response.headers());
-            System.out.println("Cuerpo: " + response.body());
+            JsonObject jsonResponse = JsonParser.parseString(response.body()).getAsJsonObject();
+
+            String codigoMoneda = jsonResponse.get("base_code").getAsString();
+            JsonObject conversiones = jsonResponse.getAsJsonObject("conversion_rates");
+
+            double dolarPeso = conversiones.get("MXN").getAsDouble();
+
+            System.out.println("Codigo de moneda:" + codigoMoneda);
+            System.out.println("1"+ codigoMoneda + " = "+ dolarPeso+" MXN");
 
         } catch (Exception e) {
             e.printStackTrace();
