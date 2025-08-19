@@ -1,60 +1,49 @@
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+
 import java.util.Scanner;
 
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+
+import static Operaciones.Operaciones.*;
 
 public class Main {
-    public static void main(String[] args) {
-        try {
-            Scanner scanner= new Scanner(System.in);
+    public static void main(String[] args) throws Exception {
+        int op=0;
+        Scanner scanner= new Scanner(System.in);
 
-            System.out.println("Ingrese su moneda base:");
-            String moneda=scanner.nextLine().toUpperCase();
-
-            System.out.println("Ingrese su moneda a convertir:");
-            String convertir=scanner.nextLine().toUpperCase();
-
-            JsonObject conversiones=tasas(moneda);
-
-            if (!conversiones.has(convertir)) {
-                System.out.println("Moneda no disponible.");
-                return;
+        String[] monedasFiltradas = {"USD","ARS", "BRL", "COP"};
+        do{
+            System.out.println("""
+                    Sea bienvenido/a al Conversor de Monedas
+                    
+                    1)Dolar -> Peso argentino
+                    2)Peso Argentino -> Dolar
+                    3) Dolar -> Real Brasileño
+                    4) real brasileño -> Dolar
+                    5) Dolar -> Peso colombiano
+                    6) Peso colombiano -> Dolar
+                    0) Salir
+                    Elije una opcion valida:
+                    
+                    """);
+            try {
+                op = Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Ingresa un número válido.");
+                continue;
             }
-            double tasaConversion=conversiones.get(convertir).getAsDouble();
 
-            System.out.println("Ingrese su cantidad a convertir");
-            double cantidad=scanner.nextDouble();
+            switch (op) {
+                case 1 -> conversiones(monedasFiltradas[0], monedasFiltradas[1]);
+                case 2 -> conversiones(monedasFiltradas[1], monedasFiltradas[0]);
+                case 3 -> conversiones(monedasFiltradas[0], monedasFiltradas[2]);
+                case 4 -> conversiones(monedasFiltradas[2], monedasFiltradas[0]);
+                case 5 -> conversiones(monedasFiltradas[0], monedasFiltradas[3]);
+                case 6 -> conversiones(monedasFiltradas[3], monedasFiltradas[0]);
+                case 0 -> System.out.println("Saliendo del programa");
+                default -> System.out.println("Ingresa una opción correcta.");
+            }
 
-
-            System.out.println(cantidad + " " + moneda + " = " + covertirCantidad(cantidad,tasaConversion) + " " + convertir);
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        }while (op!=0);
     }
 
-    public static double covertirCantidad(double dinero,double tasa){
-        return dinero*tasa;
-    }
-
-    public static JsonObject tasas(String base)throws Exception{
-        HttpClient client = HttpClient.newHttpClient();
-
-        String apiKey="78058626b6f5a16b34e84816";
-        String url="https://v6.exchangerate-api.com/v6/"+apiKey+"/latest/"+base;
-
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .build();
-
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        JsonObject jsonResponse = JsonParser.parseString(response.body()).getAsJsonObject();
-
-        return jsonResponse.getAsJsonObject("conversion_rates");
-    }
 }
